@@ -25,7 +25,10 @@ public class MediaController {
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Media>> getMediaByProduct(@PathVariable String productId) {
-        return ResponseEntity.ok(mediaService.getMediaByProductId(productId));
+        return mediaService.getMediaByProductId(productId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+
     }
 
     @DeleteMapping("/{id}")

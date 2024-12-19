@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MediaService {
@@ -20,8 +21,9 @@ public class MediaService {
         return mediaRepository.save(media);
     }
 
-    public List<Media> getMediaByProductId(String productId) {
-        return mediaRepository.findByProductId(productId);
+    public Optional<List<Media>> getMediaByProductId(String productId) {
+        List<Media> mediaList = mediaRepository.findByProductId(productId);
+        return mediaList.isEmpty() ? Optional.empty() : Optional.of(mediaList);
     }
 
     public void deleteMedia(String mediaId) {
