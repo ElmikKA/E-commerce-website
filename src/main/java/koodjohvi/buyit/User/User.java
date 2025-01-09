@@ -25,24 +25,15 @@ public class User implements UserDetails {
     private String role;
     private String avatar;
 
-    public User(String name, String email, String password, String role, String avatar) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.avatar = avatar;
-    }
-
     //UserDetails implements
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    // Dont actually need it
     @Override
     public String getPassword() {
-        return "";
+        return password;
     }
 
     @Override
