@@ -1,18 +1,29 @@
 package koodjohvi.buyit.User;
 
+import lombok.*;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Document(collection = "users")
-public class User {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements UserDetails {
 
     private String id;
     private String name;
+    @Indexed(unique = true)
     private String email;
     private String password;
     private String role;
     private String avatar;
-
-    public User() {}
 
     public User(String name, String email, String password, String role, String avatar) {
         this.name = name;
@@ -22,51 +33,20 @@ public class User {
         this.avatar = avatar;
     }
 
-    public String getId() {
-        return id;
+    //UserDetails implements
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    // Dont actually need it
+    @Override
     public String getPassword() {
-        return password;
+        return "";
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    @Override
+    public String getUsername() {
+        return email;
     }
 }

@@ -20,8 +20,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email));
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public Optional<User> findUserById(String id) {
