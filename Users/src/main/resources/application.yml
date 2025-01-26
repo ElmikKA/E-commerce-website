@@ -1,0 +1,10 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: Buy It
+
+  data:
+    mongodb:
+      uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/user_db?retryWrites=true&w=majority&appName=BuyIt
+      database: user_db
