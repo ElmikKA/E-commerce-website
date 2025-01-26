@@ -1,5 +1,6 @@
 package com.example.Users.security;
 
+import com.example.Users.jwt.JwtAuthenticationFilter;
 import com.example.Users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.logging.Logger;
 
 @Configuration
 @RequiredArgsConstructor
@@ -42,10 +41,5 @@ public class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public Logger logger() {
-        return Logger.getLogger(this.getClass().getName());
     }
 }
