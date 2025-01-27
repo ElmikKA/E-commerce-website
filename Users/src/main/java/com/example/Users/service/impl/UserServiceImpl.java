@@ -40,13 +40,15 @@ public class UserServiceImpl implements IUsersService {
     @Override
     public boolean updatedUser(UserDto userDto) {
         boolean isUpdated = false;
-        User user = userRepository.findById(userDto.getId()).orElseThrow(
-                () -> new UserNotFoundException("User", "id", userDto.getId())
-        );
-        UserMapper.mapToUsers(userDto, user);
-        userRepository.save(user);
-        isUpdated = true;
-        log.info("Updated user with id: {}", userDto.getId());
+        if(userDto.getId() != null) {
+            User user = userRepository.findById(userDto.getId()).orElseThrow(
+                    () -> new UserNotFoundException("User", "email", userDto.getId())
+            );
+            UserMapper.mapToUsers(userDto, user);
+            userRepository.save(user);
+            isUpdated = true;
+            log.info("Updated user with email: {}", userDto.getEmail());
+        }
         return isUpdated;
     }
 

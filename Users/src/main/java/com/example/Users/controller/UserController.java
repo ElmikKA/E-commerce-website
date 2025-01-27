@@ -5,6 +5,7 @@ import com.example.Users.dto.ResponseDto;
 import com.example.Users.dto.UserDto;
 import com.example.Users.dto.UserRegisterDto;
 import com.example.Users.service.impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updateUserDetails(UserDto userDto) {
+    public ResponseEntity<ResponseDto> updateUserDetails(@Valid @RequestBody UserDto userDto) {
         boolean isUpdated = userService.updatedUser(userDto);
         if(isUpdated) {
             return ResponseEntity
