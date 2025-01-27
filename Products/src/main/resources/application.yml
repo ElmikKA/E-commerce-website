@@ -1,0 +1,16 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: Buy It
+
+  data:
+    mongodb:
+      uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/product_db?retryWrites=true&w=majority&appName=BuyIt
+      database: product_db
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
