@@ -8,5 +8,5 @@ public class MediaDto {
 
     private String imagedPath;
 
-    private String userId;
+    private String productId;
 }

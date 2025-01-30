@@ -1,9 +1,6 @@
 package com.example.Media.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,13 +9,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Media {
 
     @Id
     private String id;
 
-    private String imagedPath;
+    private String imagePath;
 
-    private String userId;
+    private String productId;
+
+    public Media(String imagePath, String productId) {
+        this.imagePath = imagePath;
+        this.productId = productId;
+    }
 
 }
