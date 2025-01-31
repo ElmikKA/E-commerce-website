@@ -9,9 +9,9 @@ public interface IProductService {
 
     ProductDto fetchProductById(String id);
 
-    ProductDto fetchProductByUserId(String userId);
+    List<ProductDto> fetchProductByUserId(String userId);
 
-    boolean updateProduct(ProductDto productDto);
+    ProductDto updateProduct(ProductDto productDto, String productId);
 
     boolean deleteProduct(String id);
 }
