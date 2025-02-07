@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtUtils {
 
-    private static final String SECRET_KEY = "0f4a7d3b29a6f4c9e5b8c9e3b519f4f2d3a1e6a94f2b5e1b3f1a1e6c4b3f5a6e\n";
+    private static final String SECRET_KEY = "0f4a7d3b29a6f4c9e5b8c9e3b519f4f2d3a1e6a94f2b5e1b3f1a1e6c4b3f5a6e";
     private static final long TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 hours
 
     public String extractUsername(String token) { return extractClaims(token, Claims::getSubject); }
