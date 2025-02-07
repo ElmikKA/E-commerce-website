@@ -1,6 +1,7 @@
 package com.example.Products.service;
 
 import com.example.Products.dto.ProductDto;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -11,7 +12,9 @@ public interface IProductService {
 
     List<ProductDto> fetchProductByUserId(String userId);
 
-    ProductDto updateProduct(ProductDto productDto, String productId);
+    ProductDto createProduct(ProductDto productDto);
 
-    boolean deleteProduct(String id);
+    ProductDto updateProduct(ProductDto productDto, String productId, Authentication authentication);
+
+    boolean deleteProduct(String productId);
 }
