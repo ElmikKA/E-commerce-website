@@ -1,6 +1,4 @@
-package com.sharedDto
-
--project;
+package com.sharedDto;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
