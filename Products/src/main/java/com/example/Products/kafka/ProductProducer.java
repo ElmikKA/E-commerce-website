@@ -1,6 +1,7 @@
 package com.example.Products.kafka;
 
-import com.example.basedomains.ProductCreatedEvent;
+
+import com.sharedDto.ProductCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

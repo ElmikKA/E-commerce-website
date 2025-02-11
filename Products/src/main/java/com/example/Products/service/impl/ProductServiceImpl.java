@@ -1,6 +1,7 @@
 package com.example.Products.service.impl;
 
 import com.example.Products.Entity.Product;
+import com.example.Products.constants.ProductConstants;
 import com.example.Products.dto.ProductDto;
 import com.example.Products.exceptions.*;
 import com.example.Products.kafka.ProductProducer;
@@ -8,12 +9,13 @@ import com.example.Products.mapper.ProductMapper;
 import com.example.Products.repository.ProductRepository;
 import com.example.Products.security.SecurityUtils;
 import com.example.Products.service.IProductService;
-import com.example.basedomains.ProductCreatedEvent;
+import com.sharedDto.ProductCreatedEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,21 +32,36 @@ public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final SecurityUtils securityUtils;
     private final ProductProducer productProducer;
+    private final RestTemplate restTemplate;
 
     @Override
-    public List<ProductDto> fetchProducts() {
+    public List<ProductDto> fetchAllProducts() {
         log.info("Fetching all products");
         try {
-            return productRepository.findAll()
-                    .stream()
-                    .map(product -> ProductMapper.mapToProductDto(product, new ProductDto()))
-                    .collect(Collectors.toList());
+            List<Product> products = productRepository.findAll();
+            return products.stream().map(product -> {
+                ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
+
+                String imageUrl = getProductImage(product.getId());
+                productDto.setImagePath(imageUrl);
+
+                return productDto;
+            }).collect(Collectors.toList());
         } catch (DataAccessException e) {
             log.error("Database error while fetching products: {}", e.getMessage());
             throw new DatabaseOperationException("Failed to retrieve products due to a database error.");
         } catch (Exception e) {
             log.error("Unexpected error while fetching products: {}", e.getMessage());
             throw new InternalServerErrorException("An unexpected error occurred while retrieving the product list.");
+        }
+    }
+
+    private String getProductImage(String productId) {
+        try {
+            return restTemplate.getForObject("http://localhost:9000/api/media/" + productId, String.class);
+        } catch (Exception e) {
+            //TODO: Maybe a better exception, or add a default product picture.
+            return null;
         }
     }
 
@@ -83,44 +100,39 @@ public class ProductServiceImpl implements IProductService {
             throw new UnauthorizedAccessException("Only sellers can create products");
         }
 
-        try {
-            Product product = ProductMapper.mapToProduct(productDto, new Product());
-            product.setUserId(securityUtils.getCurrentUserId());
-            Product savedProduct = productRepository.save(product);
+        Product product = ProductMapper.mapToProduct(productDto, new Product());
+        product.setUserId(securityUtils.getCurrentUserId());
 
-            // If a file is provided, process it
-            if (file != null && !file.isEmpty()) {
-                // Convert file bytes to a Base64-encoded string
-                String base64ImageData = encodeImageToBase64(file);
-                ProductCreatedEvent event = new ProductCreatedEvent(savedProduct.getId(), base64ImageData);
-                productProducer.sendProductCreatedEvent(event);
-            }
-            return ProductMapper.mapToProductDto(savedProduct, new ProductDto());
-        } catch (IOException e) {
+        Product savedProduct;
+        try {
+            savedProduct = productRepository.save(product);
+        } catch (Exception e) {
             log.error("Database error while creating product: {}", e.getMessage());
             throw new DatabaseOperationException("Failed to create product due to database error");
         }
-    }
 
-    private String encodeImageToBase64(MultipartFile file) throws IOException {
-        try {
-            byte[] fileBytes = file.getBytes();
-            return Base64.getEncoder().encodeToString(fileBytes);
-        } catch (IOException e) {
-            log.error("Error encoding image file to Base64: {}", e.getMessage());
-            throw new InvalidInputException("Failed to process the image file");
+        if(file != null && !file.isEmpty()) {
+            try{
+                validateFile(file);
+                String base64ImageData = encodeImageToBase64(file);
+                ProductCreatedEvent event = new ProductCreatedEvent(savedProduct.getId(), base64ImageData);
+                productProducer.sendProductCreatedEvent(event);
+            } catch(Exception e) {
+                log.error("Error processing image for product id {}: {}", savedProduct.getId(), e.getMessage());
+            }
         }
+        return ProductMapper.mapToProductDto(savedProduct, new ProductDto());
     }
 
     @Override
-    public ProductDto updateProduct(ProductDto productDto, String productId, Authentication authentication) {
+    public ProductDto updateProduct(ProductDto productDto, String productId) {
         try {
             Product existingProduct = productRepository.findById(productId).orElseThrow(
                     () -> new ResourceNotFoundException("Product", "productId", productId)
             );
 
             // Verify ownership
-            if (!existingProduct.getUserId().equals(authentication.getName())) {
+            if (!existingProduct.getUserId().equals(securityUtils.getCurrentUserId())) {
                 throw new UnauthorizedAccessException("You are not authorized to update this product");
             }
 
@@ -158,5 +170,26 @@ public class ProductServiceImpl implements IProductService {
         Optional.ofNullable(productDto.getDescription()).ifPresent(product::setDescription);
         Optional.ofNullable(productDto.getPrice()).ifPresent(product::setPrice);
         Optional.of(productDto.getQuantity()).ifPresent(product::setQuantity);
+    }
+
+    //Validates the file
+    private void validateFile(MultipartFile file) {
+        if (!ProductConstants.ALLOWED_FILE_TYPES.contains(file.getContentType())) {
+            throw new MediaUploadException("Invalid file type. Only PNG and JPG are allowed.");
+        }
+
+        if (file.getSize() > ProductConstants.MAX_FILE_SIZE) {
+            throw new MediaUploadException("File size exceeds the 2MB limit.");
+        }
+    }
+
+    private String encodeImageToBase64(MultipartFile file) throws IOException {
+        try {
+            byte[] fileBytes = file.getBytes();
+            return Base64.getEncoder().encodeToString(fileBytes);
+        } catch (IOException e) {
+            log.error("Error encoding image file to Base64: {}", e.getMessage());
+            throw new InvalidInputException("Failed to process the image file");
+        }
     }
 }

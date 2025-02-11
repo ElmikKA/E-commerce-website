@@ -24,7 +24,7 @@ public class ProductController {
     @GetMapping()
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         log.info("Fetching all products");
-        return ResponseEntity.ok(productService.fetchProducts());
+        return ResponseEntity.ok(productService.fetchAllProducts());
     }
 
     // Change the mapping to accept multipart/form-data

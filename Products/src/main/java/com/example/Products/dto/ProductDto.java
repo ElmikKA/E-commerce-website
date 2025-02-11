@@ -23,4 +23,6 @@ public class ProductDto {
     private Integer quantity;
 
     private String userId;
+
+    private String imagePath;
 }
