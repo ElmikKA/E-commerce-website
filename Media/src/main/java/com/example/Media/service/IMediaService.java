@@ -13,7 +13,7 @@ public interface IMediaService {
 
     MediaDto fetchMediaByProductId(String productId);
 
-    MediaDto uploadMedia(MultipartFile multipartFile, String productId) throws IOException;
+    void uploadMedia(String imageData, String productId);
 
     boolean deleteMedia(String mediaId);
 

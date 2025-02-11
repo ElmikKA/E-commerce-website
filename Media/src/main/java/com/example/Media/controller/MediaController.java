@@ -32,13 +32,13 @@ public class MediaController {
         return ResponseEntity.ok(mediaService.fetchMediaByProductId(productId));
     }
 
-    @PostMapping(path = "/upload")
-    public ResponseEntity<MediaDto> uploadMedia(@RequestParam("file") MultipartFile file, @RequestParam("productId") String productId) throws IOException {
-        MediaDto mediaDto = mediaService.uploadMedia(file, productId);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(mediaDto);
-    }
+//    @PostMapping(path = "/upload")
+//    public ResponseEntity<MediaDto> uploadMedia(@RequestParam("file") MultipartFile file, @RequestParam("productId") String productId) throws IOException {
+//        MediaDto mediaDto = mediaService.uploadMedia(file, productId);
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .body(mediaDto);
+//    }
 
     @DeleteMapping(path = "/delete/{productId}")
     public ResponseEntity<ResponseDto> deleteMedia(@PathVariable String productId) {

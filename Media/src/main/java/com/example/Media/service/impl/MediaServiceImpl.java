@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -55,17 +56,23 @@ public class MediaServiceImpl implements IMediaService {
     }
 
     @Override
-    public MediaDto uploadMedia(MultipartFile multipartFile, String productId) {
-        validateFile(multipartFile);
+    public void uploadMedia(String imageData, String productId) {
+        if (imageData == null || imageData.isEmpty()) {
+            throw new MediaUploadException("Image data is empty");
+        }
 
         try{
-            String filename = generateUniqueFileName(multipartFile);
-            Path filePath = storeFile(multipartFile, filename);
+            // Decode the Base64 string into bytes
+            byte[] imageBytes = Base64.getDecoder().decode(imageData);
+            // For example, generate a unique filename
+            String filename = generateUniqueFileName(imageBytes);
+            // Store the file (you can implement a new method that accepts a byte[] instead of a MultipartFile)
+            Path filePath = storeFile(imageBytes, filename);
 
+            // Create and save the media record
             Media media = new Media(filePath.toString(), productId);
             mediaRepository.save(media);
-
-            return MediaMapper.mapToMediaDto(media, new MediaDto());
+            log.info("Media uploaded successfully for product {}", productId);
 
         } catch(IOException e) {
             log.error("File upload failed for product {}: {}", productId, e.getMessage());
@@ -102,21 +109,18 @@ public class MediaServiceImpl implements IMediaService {
         }
     }
 
-    private String generateUniqueFileName(MultipartFile file) {
-        String originalFileName = StringUtils.cleanPath(
-                Objects.requireNonNull(file.getOriginalFilename(), "File must have a name")
-        );
+    private String generateUniqueFileName(byte[] file) {
         String uuid = UUID.randomUUID().toString();
-        return uuid + originalFileName;
+        return uuid;
     }
 
-    private Path storeFile(MultipartFile file, String filename) throws IOException {
-        Path uploadPath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
-        Files.createDirectories(uploadPath);
-
+    private Path storeFile(byte[] fileData, String filename) throws IOException {
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
         Path filePath = uploadPath.resolve(filename);
-        Files.copy(file.getInputStream(), filePath);
-
+        Files.write(filePath, fileData);
         return filePath;
     }
 }
