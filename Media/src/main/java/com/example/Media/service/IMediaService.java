@@ -2,19 +2,25 @@ package com.example.Media.service;
 
 import com.example.Media.Entity.Media;
 import com.example.Media.dtos.MediaDto;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public interface IMediaService {
 
     List<MediaDto> fetchAllMedia();
 
-    MediaDto fetchMediaByProductId(String productId);
+    String fetchMediaByProductId(String productId);
 
-    MediaDto uploadMedia(MultipartFile multipartFile, String productId) throws IOException;
+    void uploadMedia(String imageData, String productId);
 
     boolean deleteMedia(String mediaId);
+
+    Resource loadFileAsResource(String fileName);
+
+    String getContentType(Path filePath);
 
 }

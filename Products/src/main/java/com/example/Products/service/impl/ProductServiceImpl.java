@@ -1,19 +1,25 @@
 package com.example.Products.service.impl;
 
 import com.example.Products.Entity.Product;
+import com.example.Products.constants.ProductConstants;
 import com.example.Products.dto.ProductDto;
 import com.example.Products.exceptions.*;
+import com.example.Products.kafka.ProductProducer;
 import com.example.Products.mapper.ProductMapper;
 import com.example.Products.repository.ProductRepository;
 import com.example.Products.security.SecurityUtils;
 import com.example.Products.service.IProductService;
+import com.sharedDto.ProductCreatedEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,15 +31,22 @@ public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
     private final SecurityUtils securityUtils;
+    private final ProductProducer productProducer;
+    private final RestTemplate restTemplate;
 
     @Override
-    public List<ProductDto> fetchProducts() {
+    public List<ProductDto> fetchAllProducts() {
         log.info("Fetching all products");
         try {
-            return productRepository.findAll()
-                    .stream()
-                    .map(product -> ProductMapper.mapToProductDto(product, new ProductDto()))
-                    .collect(Collectors.toList());
+            List<Product> products = productRepository.findAll();
+            return products.stream().map(product -> {
+                ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
+
+                String imageUrl = getProductImage(product.getId());
+                productDto.setImagePath(imageUrl);
+
+                return productDto;
+            }).collect(Collectors.toList());
         } catch (DataAccessException e) {
             log.error("Database error while fetching products: {}", e.getMessage());
             throw new DatabaseOperationException("Failed to retrieve products due to a database error.");
@@ -43,9 +56,17 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
+    private String getProductImage(String productId) {
+        try {
+            return restTemplate.getForObject("http://localhost:9000/api/media/" + productId, String.class);
+        } catch (Exception e) {
+            //TODO: Maybe a better exception, or add a default product picture.
+            return null;
+        }
+    }
+
     @Override
     public ProductDto fetchProductById(String productId) {
-        validateProductId(productId);
         try {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
@@ -58,7 +79,6 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductDto> fetchProductByUserId(String userId) {
-        validateUserId(userId);
         try {
             List<Product> products = productRepository.findProductByUserId(userId).orElseThrow(
                     () -> new ResourceNotFoundException("Product", "userId", userId)
@@ -73,42 +93,46 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductDto createProduct(ProductDto productDto) {
-        //TODO: Add ownership verification
-        // 1. Validate user role
-        log.info("Creating product for user: {}", securityUtils.getCurrentUserId());
+    public ProductDto createProduct(ProductDto productDto, MultipartFile file) {
+        log.info("Received product DTO: {}", productDto);
         if (!securityUtils.getCurrentUserRole().equals("SELLER")) {
             log.warn("Unauthorized product creation attempt by user: {}", securityUtils.getCurrentUserId());
             throw new UnauthorizedAccessException("Only sellers can create products");
         }
 
-        validateProductCreationInput(productDto);
+        Product product = ProductMapper.mapToProduct(productDto, new Product());
+        product.setUserId(securityUtils.getCurrentUserId());
 
+        Product savedProduct;
         try {
-            Product product = ProductMapper.mapToProduct(productDto, new Product());
-
-            product.setUserId(securityUtils.getCurrentUserId());
-
-            Product savedProduct = productRepository.save(product);
-            return ProductMapper.mapToProductDto(savedProduct, new ProductDto());
-        } catch (DataAccessException e) {
+            savedProduct = productRepository.save(product);
+        } catch (Exception e) {
             log.error("Database error while creating product: {}", e.getMessage());
             throw new DatabaseOperationException("Failed to create product due to database error");
         }
+
+        if(file != null && !file.isEmpty()) {
+            try{
+                validateFile(file);
+                String base64ImageData = encodeImageToBase64(file);
+                ProductCreatedEvent event = new ProductCreatedEvent(savedProduct.getId(), base64ImageData);
+                productProducer.sendProductCreatedEvent(event);
+            } catch(Exception e) {
+                log.error("Error processing image for product id {}: {}", savedProduct.getId(), e.getMessage());
+            }
+        }
+        return ProductMapper.mapToProductDto(savedProduct, new ProductDto());
     }
 
     @Override
-    public ProductDto updateProduct(ProductDto productDto, String productId, Authentication authentication) {
-        validateProductId(productId);
-        validateProductInput(productDto);
-
+    public ProductDto updateProduct(ProductDto productDto, String productId) {
         try {
             Product existingProduct = productRepository.findById(productId).orElseThrow(
                     () -> new ResourceNotFoundException("Product", "productId", productId)
             );
 
             // Verify ownership
-            if (!existingProduct.getUserId().equals(authentication.getName())) {
+            if (!existingProduct.getUserId().equals(securityUtils.getCurrentUserId())) {
                 throw new UnauthorizedAccessException("You are not authorized to update this product");
             }
 
@@ -124,13 +148,13 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public boolean deleteProduct(String productId) {
-        validateProductId(productId);
         try {
             Product product = productRepository.findById(productId).orElseThrow(
                     () -> new ResourceNotFoundException("Product", "productId", productId)
             );
-            //TODO: Add ownership verification
-
+            if(!product.getUserId().equals(securityUtils.getCurrentUserId())) {
+                throw new UnauthorizedAccessException("You are not authorized to delete this product");
+            }
 
             productRepository.deleteById(productId);
             log.info("Deleted product with id: {}", productId);
@@ -148,45 +172,24 @@ public class ProductServiceImpl implements IProductService {
         Optional.of(productDto.getQuantity()).ifPresent(product::setQuantity);
     }
 
-    private void validateProductId(String productId) {
-        if (!StringUtils.hasText(productId)) {
-            throw new InvalidInputException("Product ID cannot be empty");
+    //Validates the file
+    private void validateFile(MultipartFile file) {
+        if (!ProductConstants.ALLOWED_FILE_TYPES.contains(file.getContentType())) {
+            throw new MediaUploadException("Invalid file type. Only PNG and JPG are allowed.");
+        }
+
+        if (file.getSize() > ProductConstants.MAX_FILE_SIZE) {
+            throw new MediaUploadException("File size exceeds the 2MB limit.");
         }
     }
 
-    private void validateUserId(String userId) {
-        if (!StringUtils.hasText(userId)) {
-            throw new InvalidInputException("User ID cannot be empty");
-        }
-    }
-
-    private void validateProductInput(ProductDto productDto) {
-        if (productDto == null) {
-            throw new InvalidInputException("Product data cannot be null");
-        }
-        if (!StringUtils.hasText(productDto.getName())) {
-            throw new InvalidInputException("Product name cannot be empty");
-        }
-        if (productDto.getPrice() == null || productDto.getPrice() <= 0) {
-            throw new InvalidInputException("Invalid product price");
-        }
-    }
-
-    private void validateProductCreationInput(ProductDto productDto) {
-        if (productDto == null) {
-            throw new InvalidInputException("Product data cannot be null");
-        }
-
-        if (!StringUtils.hasText(productDto.getName())) {
-            throw new InvalidInputException("Product name cannot be empty");
-        }
-
-        if (productDto.getPrice() == null || productDto.getPrice() <= 0) {
-            throw new InvalidInputException("Product price must be a positive number");
-        }
-
-        if (productDto.getQuantity() < 0) {
-            throw new InvalidInputException("Product quantity cannot be negative");
+    private String encodeImageToBase64(MultipartFile file) throws IOException {
+        try {
+            byte[] fileBytes = file.getBytes();
+            return Base64.getEncoder().encodeToString(fileBytes);
+        } catch (IOException e) {
+            log.error("Error encoding image file to Base64: {}", e.getMessage());
+            throw new InvalidInputException("Failed to process the image file");
         }
     }
 }

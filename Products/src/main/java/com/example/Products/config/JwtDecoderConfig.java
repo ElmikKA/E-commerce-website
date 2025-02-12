@@ -1,5 +1,6 @@
 package com.example.Products.config;
 
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -15,7 +16,8 @@ public class JwtDecoderConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        // Decode the secret key from Base64
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         SecretKeySpec key = new SecretKeySpec(keyBytes, "HMACSHA256");
         return NimbusJwtDecoder.withSecretKey(key).build();
     }

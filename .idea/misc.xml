@@ -8,7 +8,14 @@
         <option value="$PROJECT_DIR$/Media/pom.xml" />
         <option value="$PROJECT_DIR$/Users/pom.xml" />
         <option value="$PROJECT_DIR$/Products/pom.xml" />
+        <option value="$PROJECT_DIR$/shared-dto/pom.xml" />
+        <option value="$PROJECT_DIR$/base-domains/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/base-domains/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK">

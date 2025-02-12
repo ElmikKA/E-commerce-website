@@ -1,9 +1,21 @@
 server:
-  port: 8080
+  port: 9000
 spring:
   application:
     name: Buy It
-
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    consumer:
+      group-id: media-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      bootstrap-servers: "localhost:9092"
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
     mongodb:
       uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/media_db?retryWrites=true&w=majority&appName=BuyIt
