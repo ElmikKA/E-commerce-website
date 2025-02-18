@@ -8,8 +8,6 @@ import java.util.List;
 public interface IProductService {
     List<ProductDto> fetchAllProducts();
 
-    ProductDto fetchProductById(String id);
-
     List<ProductDto> fetchProductByUserId(String userId);
 
     ProductDto createProduct(ProductDto productDto, MultipartFile file);
