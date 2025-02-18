@@ -3,14 +3,10 @@ server:
 
 spring:
   application:
-    name: buy-it
-  kafka:
-    bootstrap-servers: "localhost:9092"
-    producer:
-      bootstrap-servers: "localhost:9092"
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    name: products
 
+  kafka:
+    bootstrap-servers: "kafka:9092"
     consumer:
       group-id: product-service-group
       auto-offset-reset: earliest
@@ -18,6 +14,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   data:
     mongodb:

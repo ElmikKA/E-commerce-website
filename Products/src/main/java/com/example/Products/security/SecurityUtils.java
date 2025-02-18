@@ -1,6 +1,7 @@
 package com.example.Products.security;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,17 +14,8 @@ public class SecurityUtils {
 
     public String getCurrentUserId() {
         Authentication authentication = validateIfUserIsAuthenticated();
-
+        Jwt jwt = getJwt(authentication);
         log.info("Calls this function");
-
-        Jwt jwt;
-        if (authentication instanceof JwtAuthenticationToken) {
-            jwt = ((JwtAuthenticationToken) authentication).getToken();
-        } else if (authentication.getPrincipal() instanceof Jwt) {
-            jwt = (Jwt) authentication.getPrincipal();
-        } else {
-            throw new IllegalStateException("Authentication principal is not a Jwt");
-        }
 
         String userId = jwt.getClaim("userId");
         if (userId == null || userId.isEmpty()) {
@@ -34,15 +26,7 @@ public class SecurityUtils {
 
     public String getCurrentUserRole() {
         Authentication authentication = validateIfUserIsAuthenticated();
-
-        Jwt jwt;
-        if (authentication instanceof JwtAuthenticationToken) {
-            jwt = ((JwtAuthenticationToken) authentication).getToken();
-        } else if (authentication.getPrincipal() instanceof Jwt) {
-            jwt = (Jwt) authentication.getPrincipal();
-        } else {
-            throw new IllegalStateException("Authentication principal is not a Jwt");
-        }
+        Jwt jwt = getJwt(authentication);
 
         String role = jwt.getClaim("userRole");
         if (role == null || role.isEmpty()) {
@@ -51,10 +35,21 @@ public class SecurityUtils {
         return role;
     }
 
+    private Jwt getJwt(Authentication authentication) {
+        if (authentication instanceof JwtAuthenticationToken) {
+            return ((JwtAuthenticationToken) authentication).getToken();
+        } else if (authentication.getPrincipal() instanceof Jwt) {
+            return (Jwt) authentication.getPrincipal();
+        } else {
+            //This should not happen, but if it does, BadCredentialsException is correct.
+            throw new BadCredentialsException("Authentication principal is not a Jwt");
+        }
+    }
+
     private Authentication validateIfUserIsAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User is not authenticated");
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BadCredentialsException("User is not authenticated");
         }
         return authentication;
     }

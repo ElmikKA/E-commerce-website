@@ -2,9 +2,9 @@ server:
   port: 9000
 spring:
   application:
-    name: Buy It
+    name: media
   kafka:
-    bootstrap-servers: "localhost:9092"
+    bootstrap-servers: "kafka:9092"
     consumer:
       group-id: media-service-group
       auto-offset-reset: earliest
@@ -13,7 +13,6 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
     producer:
-      bootstrap-servers: "localhost:9092"
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
