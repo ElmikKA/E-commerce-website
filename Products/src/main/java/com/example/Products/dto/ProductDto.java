@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductDto {
 
+    private String id;
+
     @NotBlank(message = "Product name cannot be empty")
     private String name;
 

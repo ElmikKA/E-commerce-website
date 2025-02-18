@@ -10,10 +10,11 @@ import com.example.Products.repository.ProductRepository;
 import com.example.Products.security.SecurityUtils;
 import com.example.Products.service.IProductService;
 import com.sharedDto.ProductCreatedEvent;
+import com.sharedDto.ProductDeletedEvent;
+import com.sharedDto.RequestingProductImage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +43,9 @@ public class ProductServiceImpl implements IProductService {
             return products.stream().map(product -> {
                 ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
 
-                String imageUrl = getProductImage(product.getId());
-                productDto.setImagePath(imageUrl);
+//                String imageUrl = productProducer.requestingProductImages(new RequestingProductImage(product.getId()));
+                //TODO: Need to add correct value
+                productDto.setImagePath("TODO");
 
                 return productDto;
             }).collect(Collectors.toList());
@@ -53,27 +55,6 @@ public class ProductServiceImpl implements IProductService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching products: {}", e.getMessage());
             throw new InternalServerErrorException("An unexpected error occurred while retrieving the product list.");
-        }
-    }
-
-    private String getProductImage(String productId) {
-        try {
-            return restTemplate.getForObject("http://localhost:9000/api/media/" + productId, String.class);
-        } catch (Exception e) {
-            //TODO: Maybe a better exception, or add a default product picture.
-            return null;
-        }
-    }
-
-    @Override
-    public ProductDto fetchProductById(String productId) {
-        try {
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-            return ProductMapper.mapToProductDto(product, new ProductDto());
-        } catch (DataAccessException e) {
-            log.error("Database error while fetching product ID {}: {}", productId, e.getMessage());
-            throw new DatabaseOperationException("Failed to retrieve product due to database error");
         }
     }
 
@@ -146,6 +127,7 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
+    //TODO: Needs to call Media Delete as well with Kafka
     @Override
     public boolean deleteProduct(String productId) {
         try {
@@ -158,6 +140,11 @@ public class ProductServiceImpl implements IProductService {
 
             productRepository.deleteById(productId);
             log.info("Deleted product with id: {}", productId);
+
+            ProductDeletedEvent event = new ProductDeletedEvent(product.getId());
+            log.info("Sending a message to Media Service");
+            productProducer.sendProductDeletedEvent(event);
+
             return true;
         } catch (DataAccessException e) {
             log.error("Database error while deleting product {}: {}", productId, e.getMessage());

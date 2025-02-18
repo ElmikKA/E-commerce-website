@@ -5,6 +5,7 @@ import com.example.Products.dto.ProductDto;
 
 public class ProductMapper {
     public static ProductDto mapToProductDto(Product product, ProductDto productDto) {
+        productDto.setId(product.getId());
         productDto.setName(product.getName());
         productDto.setDescription(product.getDescription());
         productDto.setPrice(product.getPrice());
