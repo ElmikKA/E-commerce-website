@@ -9,10 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>Media</artifactId>
+	<artifactId>media</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Media</name>
 	<description>Microservice for Media</description>
+	<packaging>jar</packaging>
 	<url/>
 	<licenses>
 		<license/>
@@ -118,6 +119,17 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.2</version>
+				<configuration>
+					<to>
+						<image>koodjohvi/${project.artifactId}:buyit</image>
+					</to>
 				</configuration>
 			</plugin>
 		</plugins>

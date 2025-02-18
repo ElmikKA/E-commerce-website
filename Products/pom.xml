@@ -9,10 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>Products</artifactId>
+	<artifactId>products</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Products</name>
 	<description>Microservice for Products</description>
+	<packaging>jar</packaging>
 	<url/>
 	<licenses>
 		<license/>
@@ -84,6 +85,7 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
+			<version>3.3.2</version>
 		</dependency>
 
 
@@ -137,6 +139,17 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.2</version>
+				<configuration>
+					<to>
+						<image>koodjohvi/${project.artifactId}:buyit</image>
+					</to>
 				</configuration>
 			</plugin>
 		</plugins>
