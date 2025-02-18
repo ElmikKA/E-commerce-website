@@ -3,9 +3,13 @@ package com.example.Media.kafka;
 import com.example.Media.service.IMediaService;
 
 import com.sharedDto.ProductCreatedEvent;
+import com.sharedDto.ProductDeletedEvent;
+import com.sharedDto.RequestingProductImage;
+import com.sharedDto.ImageResponseFromMedia;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class MediaEventListener {
     private final IMediaService mediaService;
+    private final MediaProducer mediaProducer;
 
     @KafkaListener(topics = "product-created", groupId = "media-service-group")
     public void handleProductCreatedEvent(ProductCreatedEvent event) {
@@ -21,5 +26,21 @@ public class MediaEventListener {
         } catch (Exception e) {
             System.err.println("Error processing Kafka message: " + e.getMessage());
         }
+    }
+
+    @KafkaListener(topics = "product-deleted", groupId = "media-service-group")
+    public void handleProductDeletedEvent(ProductDeletedEvent event) {
+        try {
+            mediaService.deleteMedia(event.getProductId());
+        } catch (Exception e) {
+            System.err.println("Error processing Kafka message: " + e.getMessage());
+        }
+    }
+
+    @KafkaListener(topics = "product-image-request", groupId = "media-service-group")
+    @SendTo
+    public ImageResponseFromMedia handleProductImageRequestEvent(RequestingProductImage event) {
+            String imagePath = mediaService.fetchMediaByProductId(event.getProductId());
+            return new ImageResponseFromMedia(imagePath);
     }
 }

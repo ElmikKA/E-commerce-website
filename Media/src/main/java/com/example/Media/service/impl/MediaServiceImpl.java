@@ -78,6 +78,7 @@ public class MediaServiceImpl implements IMediaService {
         Media media = mediaRepository.findMediaByProductId(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Media", "productId", productId)
         );
+        log.info("Deleting media with productId: {}", productId);
         try{
             Path filePath = Paths.get(media.getImagePath());
             Files.deleteIfExists(filePath);
@@ -85,6 +86,7 @@ public class MediaServiceImpl implements IMediaService {
             log.warn("Failed to delete media file {}: {}", media.getImagePath(), e.getMessage());
         }
         mediaRepository.deleteById(media.getId());
+        log.info("Media Deleted with productId: {}", productId);
         return true;
     }
 
