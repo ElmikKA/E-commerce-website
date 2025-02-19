@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageResponseFromMedia {
+    private String productId;
     private String imagePath;
 }
