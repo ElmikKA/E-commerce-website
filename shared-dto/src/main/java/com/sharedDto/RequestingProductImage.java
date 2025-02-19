@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RequestingProductImage {
     private String productId;
+    private String replyTopic;
 }
