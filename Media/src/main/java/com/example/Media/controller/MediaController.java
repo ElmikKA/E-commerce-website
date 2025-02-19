@@ -2,24 +2,16 @@ package com.example.Media.controller;
 
 import com.example.Media.dtos.MediaDto;
 import com.example.Media.dtos.ResponseDto;
-import com.example.Media.exceptions.MediaUploadException;
-import com.example.Media.exceptions.ResourceNotFoundException;
 import com.example.Media.service.IMediaService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,7 +23,6 @@ import java.util.List;
 public class MediaController {
 
     private final IMediaService mediaService;
-
     private static final String UPLOAD_DIR = "uploads";
 
     @GetMapping()
