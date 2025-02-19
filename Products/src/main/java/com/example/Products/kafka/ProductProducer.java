@@ -1,5 +1,6 @@
 package com.example.Products.kafka;
 
+import com.example.Products.constants.ProductConstants;
 import com.sharedDto.ImageResponseFromMedia;
 import com.sharedDto.RequestingProductImage;
 import com.sharedDto.ProductCreatedEvent;
@@ -8,6 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyMessageFuture;
@@ -17,10 +23,12 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 import static com.example.Products.constants.ProductConstants.*;
 
@@ -30,6 +38,7 @@ import static com.example.Products.constants.ProductConstants.*;
 public class ProductProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final Map<String, CompletableFuture<ImageResponseFromMedia>> pendingRequests = new ConcurrentHashMap<>();
 //    private final ReplyingKafkaTemplate<String, RequestingProductImage, ImageResponseFromMedia> replyingKafkaTemplate;
 
     public void sendProductCreatedEvent(ProductCreatedEvent productCreatedEvent) {
@@ -50,47 +59,37 @@ public class ProductProducer {
         kafkaTemplate.send(message);
     }
 
-//    public String requestingProductImages(RequestingProductImage requestingProductImage) {
-//        log.info("Requesting Product images for product ID: {}", requestingProductImage.getProductId());
-//
-//        String correlationId = UUID.randomUUID().toString();
-//        String replyTopic = "product-image-response-topic";
-//
-//        Message<RequestingProductImage> message = MessageBuilder
-//                .withPayload(requestingProductImage)
-//                .setHeader(KafkaHeaders.TOPIC, TOPIC_GETTING_IMAGE)
-//                .setHeader(KafkaHeaders.REPLY_TOPIC, replyTopic)
-//                .setHeader(KafkaHeaders.CORRELATION_ID, correlationId)
-//                .build();
-//
-//        try {
-//            RequestReplyMessageFuture<String, RequestingProductImage> future =
-//                    replyingKafkaTemplate.sendAndReceive(message);
-//
-//            // Explicitly handle the cast
-//            Message<?> rawResponseMessage = future.get(10, TimeUnit.SECONDS);
-//
-//            // Validate the payload type
-//            if (rawResponseMessage.getPayload() instanceof ImageResponseFromMedia response) {
-//                return response.getImagePath();
-//            } else {
-//                throw new IllegalStateException("Unexpected response type: "
-//                        + rawResponseMessage.getPayload().getClass());
-//            }
-//
-//        } catch (TimeoutException e) {
-//            log.error("Timeout fetching image for product {}: {}",
-//                    requestingProductImage.getProductId(), e.getMessage());
-//            throw new RuntimeException("Image service timeout", e);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            log.error("Request interrupted for product {}: {}",
-//                    requestingProductImage.getProductId(), e.getMessage());
-//            throw new RuntimeException("Image request interrupted", e);
-//        } catch (ExecutionException e) {
-//            log.error("Execution failed for product {}: {}",
-//                    requestingProductImage.getProductId(), e.getMessage());
-//            throw new RuntimeException("Image service error", e.getCause());
-//        }
-//    }
+    public String requestingProductImages(String productId) throws ExecutionException, InterruptedException, TimeoutException {
+        log.info("Requesting Product images for product ID: {}", productId);
+
+        // 1. Create Request Event
+        RequestingProductImage request = new RequestingProductImage(productId, "product-image-replies");
+
+        // 2. Send Request and Create CompletableFuture
+        CompletableFuture<ImageResponseFromMedia> future = new CompletableFuture<>();
+        pendingRequests.put(productId, future);
+
+        // Use MessageBuilder to construct the request message
+        Message<RequestingProductImage> message = MessageBuilder
+                .withPayload(request)
+                .setHeader(KafkaHeaders.TOPIC, "product-image-request") // Set the correct request topic
+                .build();
+
+        kafkaTemplate.send(message); // Send the message using the message object
+
+        // 3. Wait for the Response (with a Timeout) - handled by the listener
+        ImageResponseFromMedia response = future.get(10, TimeUnit.SECONDS);
+        pendingRequests.remove(productId);
+        return response.getImagePath();
+    }
+
+    // 4. Kafka Listener (outside the requestingProductImages method)
+    @KafkaListener(topics = "product-image-replies", groupId = "product-service-group")
+    public void handleImageResponse(ImageResponseFromMedia response) {
+        String productId = response.getProductId();
+        CompletableFuture<ImageResponseFromMedia> future = pendingRequests.get(productId);
+        if (future!= null) {
+            future.complete(response);
+        }
+    }
 }

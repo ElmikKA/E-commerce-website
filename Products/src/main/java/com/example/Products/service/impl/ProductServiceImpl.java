@@ -11,7 +11,6 @@ import com.example.Products.security.SecurityUtils;
 import com.example.Products.service.IProductService;
 import com.sharedDto.ProductCreatedEvent;
 import com.sharedDto.ProductDeletedEvent;
-import com.sharedDto.RequestingProductImage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -23,6 +22,8 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,9 +44,12 @@ public class ProductServiceImpl implements IProductService {
             return products.stream().map(product -> {
                 ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
 
-//                String imageUrl = productProducer.requestingProductImages(new RequestingProductImage(product.getId()));
-                //TODO: Need to add correct value
-                productDto.setImagePath("TODO");
+                try {
+                    String imagePath = productProducer.requestingProductImages(product.getId());
+                    productDto.setImagePath(imagePath);
+                } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                    throw new RuntimeException(e);
+                }
 
                 return productDto;
             }).collect(Collectors.toList());
