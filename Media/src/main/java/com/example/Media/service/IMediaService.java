@@ -14,7 +14,7 @@ public interface IMediaService {
 
     void uploadMedia(String imageData, String productId);
 
-    boolean deleteMedia(String mediaId);
+    void deleteMedia(String mediaId);
 
     Resource loadFileAsResource(String fileName);
 

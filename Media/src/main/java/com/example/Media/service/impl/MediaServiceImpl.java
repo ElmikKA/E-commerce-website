@@ -74,7 +74,7 @@ public class MediaServiceImpl implements IMediaService {
     }
 
     @Override
-    public boolean deleteMedia(String productId) {
+    public void deleteMedia(String productId) {
         Media media = mediaRepository.findMediaByProductId(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Media", "productId", productId)
         );
@@ -87,7 +87,6 @@ public class MediaServiceImpl implements IMediaService {
         }
         mediaRepository.deleteById(media.getId());
         log.info("Media Deleted with productId: {}", productId);
-        return true;
     }
 
     @Override
