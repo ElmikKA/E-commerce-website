@@ -116,7 +116,6 @@ public class ProductServiceImpl implements IProductService {
                     () -> new ResourceNotFoundException("Product", "productId", productId)
             );
 
-            // Verify ownership
             if (!existingProduct.getUserId().equals(securityUtils.getCurrentUserId())) {
                 throw new UnauthorizedAccessException("You are not authorized to update this product");
             }
@@ -131,7 +130,6 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
-    //TODO: Needs to call Media Delete as well with Kafka
     @Override
     public boolean deleteProduct(String productId) {
         try {
@@ -163,7 +161,6 @@ public class ProductServiceImpl implements IProductService {
         Optional.of(productDto.getQuantity()).ifPresent(product::setQuantity);
     }
 
-    //Validates the file
     private void validateFile(MultipartFile file) {
         if (!ProductConstants.ALLOWED_FILE_TYPES.contains(file.getContentType())) {
             throw new MediaUploadException("Invalid file type. Only PNG and JPG are allowed.");

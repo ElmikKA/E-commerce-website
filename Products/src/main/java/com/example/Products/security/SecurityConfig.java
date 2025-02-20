@@ -17,12 +17,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Allow GET requests to /products (listing products)
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
-                        // Require "SELLER" role for POST requests to /products (creating products)
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("SELLER")
-                        // Any other requests can be authenticated (adjust as needed)
-                        .anyRequest().authenticated() // Or permitAll() if you really want other endpoints open
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();

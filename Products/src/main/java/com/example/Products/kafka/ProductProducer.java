@@ -61,29 +61,23 @@ public class ProductProducer {
 
     public String requestingProductImages(String productId) throws ExecutionException, InterruptedException, TimeoutException {
         log.info("Requesting Product images for product ID: {}", productId);
-
-        // 1. Create Request Event
         RequestingProductImage request = new RequestingProductImage(productId, "product-image-replies");
 
-        // 2. Send Request and Create CompletableFuture
         CompletableFuture<ImageResponseFromMedia> future = new CompletableFuture<>();
         pendingRequests.put(productId, future);
 
-        // Use MessageBuilder to construct the request message
         Message<RequestingProductImage> message = MessageBuilder
                 .withPayload(request)
                 .setHeader(KafkaHeaders.TOPIC, "product-image-request") // Set the correct request topic
                 .build();
 
-        kafkaTemplate.send(message); // Send the message using the message object
+        kafkaTemplate.send(message);
 
-        // 3. Wait for the Response (with a Timeout) - handled by the listener
         ImageResponseFromMedia response = future.get(10, TimeUnit.SECONDS);
         pendingRequests.remove(productId);
         return response.getImagePath();
     }
 
-    // 4. Kafka Listener (outside the requestingProductImages method)
     @KafkaListener(topics = "product-image-replies", groupId = "product-service-group")
     public void handleImageResponse(ImageResponseFromMedia response) {
         String productId = response.getProductId();

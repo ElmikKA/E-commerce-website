@@ -41,7 +41,6 @@ public class SecurityUtils {
         } else if (authentication.getPrincipal() instanceof Jwt) {
             return (Jwt) authentication.getPrincipal();
         } else {
-            //This should not happen, but if it does, BadCredentialsException is correct.
             throw new BadCredentialsException("Authentication principal is not a Jwt");
         }
     }
