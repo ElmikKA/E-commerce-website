@@ -1,6 +1,6 @@
 package com.example.Products.exceptions;
 
-import com.example.Products.dto.ErrorResponseDto;
+import com.sharedDto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

@@ -1,8 +1,8 @@
 package com.example.Media.controller;
 
 import com.example.Media.dtos.MediaDto;
-import com.example.Media.dtos.ResponseDto;
 import com.example.Media.service.IMediaService;
+import com.sharedDto.ResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -34,6 +34,7 @@ public class MediaController {
     public ResponseEntity<String> getMediaByProductId(@PathVariable String productId) {
         return ResponseEntity.ok(mediaService.fetchMediaByProductId(productId));
     }
+
 
     @GetMapping("/file/{filename}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {

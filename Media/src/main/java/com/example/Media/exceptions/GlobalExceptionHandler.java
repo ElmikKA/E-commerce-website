@@ -1,6 +1,6 @@
 package com.example.Media.exceptions;
 
-import com.example.Media.dtos.ErrorResponseDto;
+import com.sharedDto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -35,7 +35,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
     }
 
-    //This method creates for all the Exceptions a common response
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception, WebRequest webRequest) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(

@@ -1,15 +1,14 @@
-package com.example.Products.dto;
+package com.sharedDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ResponseDto {
-
-//    @Schema(description = "Status code")
     private String statusCode;
 
-//    @Schema(description = "Status message")
     private String statusMsg;
 }
