@@ -1,0 +1,19 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  
+  .navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .spacer {
+    flex: 1;
+  }
+  
+  .navbar-button {
+    margin-left: 10px;
+  }
+  

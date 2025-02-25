@@ -1,0 +1,41 @@
+<div class="profile-container">
+    <h2>User Profile</h2>
+  
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+
+    <div *ngIf="currentUser">
+      <h2>Profile</h2>
+      <p><strong>Name:</strong> {{ currentUser.name }}</p>
+      <p><strong>Email:</strong> {{ currentUser.email }}</p>
+      <p><strong>Role:</strong> {{ currentUser.role }}</p>
+      <p><strong>Avatar:</strong> <img [src]="currentUser.avatar" alt="User Avatar" *ngIf="currentUser.avatar"></p>
+    </div>
+  
+    <div *ngIf="errorMsg" class="error-message">
+      {{ errorMsg }}
+    </div>
+  
+    <form *ngIf="currentUser && !isLoading" (ngSubmit)="saveProfile()">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="currentUser.name" name="name" required />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput [(ngModel)]="currentUser.email" name="email" required />
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline" disabled>
+        <mat-label>Role</mat-label>
+        <input matInput [value]="currentUser.role" />
+      </mat-form-field>
+  
+      <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </form>
+  </div>
+  

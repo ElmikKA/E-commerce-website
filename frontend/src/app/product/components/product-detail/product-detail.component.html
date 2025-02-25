@@ -1,0 +1,10 @@
+<div class="product-detail-container">
+  <mat-card>
+    <mat-card-title>{{ product.name }}</mat-card-title>
+    <mat-card-content>
+      <p>Price: {{ product.price | currency }}</p>
+      <p>Description: {{ product.description }}</p>
+    </mat-card-content>
+  </mat-card>
+  <button mat-raised-button color="primary" (click)="close()">Close</button>
+</div>

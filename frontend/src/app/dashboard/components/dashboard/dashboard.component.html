@@ -1,0 +1,35 @@
+<div class="dashboard-wrapper">
+  <div class="dashboard-container">
+    <h2>Dashboard of {{ username }}</h2>
+    <button mat-raised-button color="accent" (click)="onAddProduct()">Add Product</button>
+
+    <div class="table-container">
+      <mat-table [dataSource]="products" class="mat-elevation-z8">
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell *matCellDef="let product"> {{ product.name }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
+          <mat-cell *matCellDef="let product"> {{ product.price | currency }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef> Edit </mat-header-cell>
+          <mat-cell *matCellDef="let product">
+            <button mat-icon-button color="primary" (click)="onEdit(product)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDelete(product)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+    </div>
+  </div>
+</div>

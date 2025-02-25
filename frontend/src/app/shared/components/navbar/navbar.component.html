@@ -1,0 +1,13 @@
+<mat-toolbar color="primary" class="navbar">
+    <span class="navbar-title">E-Commerce</span>
+    <span class="spacer"></span>
+  
+    <button mat-button color="accent" class="navbar-button">Go Back</button>
+    <button mat-button color="accent" class="navbar-button" [routerLink]="'/profile'">Profile</button>
+  
+    <span *ngIf="currentUser" class="user-info">
+      Welcome, {{ currentUser.name }} ({{ currentUser.role }})
+    </span>
+  
+    <button mat-button color="warn" class="navbar-button" *ngIf="isLoggedIn" (click)="logout()">Log out</button>
+  </mat-toolbar>
