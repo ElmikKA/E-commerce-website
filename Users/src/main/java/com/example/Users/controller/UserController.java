@@ -3,11 +3,8 @@ package com.example.Users.controller;
 import com.example.Users.constants.UsersConstants;
 import com.example.Users.dto.UserDto;
 import com.example.Users.service.impl.UserServiceImpl;
-import com.sharedDto.ErrorResponseDto;
 import com.sharedDto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -78,10 +75,7 @@ public class UserController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "HTTP status Internal Server Error",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
+                    description = "HTTP status Internal Server Error"
             )
     })
     @PutMapping("/update")
@@ -112,10 +106,7 @@ public class UserController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "HTTP status Internal Server Error",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
+                    description = "HTTP status Internal Server Error"
             )
     })
     @DeleteMapping("/delete/{id}")
