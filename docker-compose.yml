@@ -1,0 +1,76 @@
+services:
+  kafka:
+    image: docker.io/bitnami/kafka:3.9
+    networks:
+      - buyit-network
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092  # Corrected: Use 'kafka' hostname
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    healthcheck:
+      test: [ "CMD-SHELL", "echo", "$$(nc -z localhost 9092)" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  users:
+    image: "koodjohvi/users:buyit"
+    container_name: user-ms
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_NAME: "users"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092 # Corrected: Use 'kafka' hostname
+    networks:
+      - buyit-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  products:
+    image: "koodjohvi/products:buyit"
+    container_name: products-ms
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_APPLICATION_NAME: "products"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:9092 # Corrected: Use 'kafka' hostname
+    networks:
+      - buyit-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  media:
+    image: "koodjohvi/media:buyit"
+    container_name: media-ms
+    ports:
+      - "9000:9000"
+    environment:
+      SPRING_APPLICATION_NAME: "media"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:9092 # Corrected: Use 'kafka' hostname
+    networks:
+      - buyit-network
+    volumes:
+      - ./uploads:/uploads
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+volumes:
+  kafka_data:
+    driver: local
+
+networks:
+  buyit-network:
+    driver: bridge
