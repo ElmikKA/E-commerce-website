@@ -2,10 +2,9 @@ package com.example.Products.Controller;
 
 import com.example.Products.constants.ProductConstants;
 import com.example.Products.dto.ProductDto;
-import com.example.Products.dto.ResponseDto;
 import com.example.Products.service.IProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
+import com.sharedDto.ResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

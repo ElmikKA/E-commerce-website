@@ -34,6 +34,7 @@ public class MediaServiceImpl implements IMediaService {
     @Override
     public List<MediaDto> fetchAllMedia() {
         try {
+            log.info("Fetching all media");
             return mediaRepository.findAll()
                     .stream()
                     .map(media -> MediaMapper.mapToMediaDto(media, new MediaDto()))
@@ -93,7 +94,6 @@ public class MediaServiceImpl implements IMediaService {
     public Resource loadFileAsResource(String fileName) {
         String cleanFileName = StringUtils.cleanPath(fileName);
         Path filePath = Paths.get(MediaConstants.UPLOAD_DIR).resolve(cleanFileName).normalize();
-
         try{
             Resource resource = new UrlResource(filePath.toUri());
             if(!resource.exists() || !resource.isReadable()) {

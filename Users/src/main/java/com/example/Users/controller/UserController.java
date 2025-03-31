@@ -1,14 +1,10 @@
 package com.example.Users.controller;
 
 import com.example.Users.constants.UsersConstants;
-import com.example.Users.dto.ErrorResponseDto;
-import com.example.Users.dto.ResponseDto;
 import com.example.Users.dto.UserDto;
-import com.example.Users.dto.UserRegisterDto;
 import com.example.Users.service.impl.UserServiceImpl;
+import com.sharedDto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +13,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,10 +75,7 @@ public class UserController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "HTTP status Internal Server Error",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
+                    description = "HTTP status Internal Server Error"
             )
     })
     @PutMapping("/update")
@@ -114,10 +106,7 @@ public class UserController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "HTTP status Internal Server Error",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
+                    description = "HTTP status Internal Server Error"
             )
     })
     @DeleteMapping("/delete/{id}")
