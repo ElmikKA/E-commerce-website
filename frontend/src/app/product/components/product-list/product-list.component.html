@@ -1,0 +1,54 @@
+<div class="product-list-container">
+  <div class="search-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Search Products</mat-label>
+      <input
+        matInput
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+        placeholder="Search Products"
+      />
+    </mat-form-field>
+  </div>
+
+  <div class="product-cards">
+    <mat-card
+      *ngFor="let product of filteredProducts"
+      class="product-card"
+      (click)="viewProduct(product.id)"
+    >
+      <mat-card-title>{{ product.name }}</mat-card-title>
+      <mat-card-content>
+        <p>Price: {{ product.price | currency }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="filters-container">
+    <mat-form-field appearance="outline" class="price-input">
+      <mat-label>Min Price</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="minPrice"
+        (ngModelChange)="applyFilters()"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="price-input">
+      <mat-label>Max Price</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="maxPrice"
+        (ngModelChange)="applyFilters()"
+      />
+    </mat-form-field>
+  </div>
+
+  <mat-paginator
+    [length]="products.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)"
+  ></mat-paginator>
+</div>

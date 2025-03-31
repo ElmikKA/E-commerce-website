@@ -1,0 +1,104 @@
+.product-list-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  padding: 15px;
+  box-sizing: border-box;
+
+  .search-bar {
+    width: 100%;
+    margin-bottom: 1.5rem;
+
+    mat-form-field {
+      width: 100%;
+      border-radius: 5px;
+      padding: 5px;
+
+      input {
+        color: #000;
+        background-color: #00dddd96;
+        font-size: 1rem;
+      }
+
+      mat-label {
+        font-size: 1rem;
+        color: #333;
+      }
+    }
+  }
+
+  .product-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-bottom: auto;
+  }
+
+  .product-card {
+    width: 250px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #00dddd;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .mat-mdc-card-title {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #000;
+      padding: 10px 0;
+    }
+
+    .mat-mdc-card-content {
+      text-align: center;
+      font-size: 1rem;
+      color: #000;
+      padding-bottom: 10px;
+    }
+  }
+
+  .filters-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 1rem;
+    padding: 10px 0;
+    border-radius: 5px;
+
+    .price-input {
+      width: 150px;
+    }
+
+    mat-form-field {
+      border-radius: 5px;
+      padding: 5px;
+
+      input {
+        color: #000;
+        font-size: 1rem;
+        background-color: #00dddd96;
+
+      }
+
+      mat-label {
+        font-size: 1rem;
+        color: #333;
+      }
+    }
+  }
+
+  mat-paginator {
+    width: 100%;
+    border-radius: 0 0 5px 5px;
+  }
+}

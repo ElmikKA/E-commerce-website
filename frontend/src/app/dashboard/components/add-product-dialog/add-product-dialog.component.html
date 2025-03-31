@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>Add Product</h2>
+<mat-dialog-content>
+  <form [formGroup]="addProductForm">
+    <mat-form-field appearance="fill">
+      <mat-label>Product Name</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error *ngIf="addProductForm.get('name')?.invalid">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" formControlName="price" />
+      <mat-error *ngIf="addProductForm.get('price')?.invalid">
+        Price must be greater than 0
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Save</button>
+</mat-dialog-actions>
