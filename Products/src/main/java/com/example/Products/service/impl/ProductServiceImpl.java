@@ -43,14 +43,12 @@ public class ProductServiceImpl implements IProductService {
             List<Product> products = productRepository.findAll();
             return products.stream().map(product -> {
                 ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
-
                 try {
                     String imagePath = productProducer.requestingProductImages(product.getId());
                     productDto.setImagePath(imagePath);
                 } catch (ExecutionException | InterruptedException | TimeoutException e) {
                     throw new RuntimeException(e);
                 }
-
                 return productDto;
             }).collect(Collectors.toList());
         } catch (DataAccessException e) {

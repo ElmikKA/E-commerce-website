@@ -23,49 +23,104 @@ services:
       timeout: 5s
       retries: 5
 
+  configserver:
+    image: "koodjohvi/configserver:buyit"
+    container_name: configserver-ms
+    ports:
+      - "8071:8071"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  eurekaserver:
+    image: "koodjohvi/eurekaserver:buyit"
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+
+    networks:
+      - buyit-network
+
   users:
     image: "koodjohvi/users:buyit"
     container_name: user-ms
     ports:
       - "8080:8080"
-    environment:
-      SPRING_APPLICATION_NAME: "users"
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092 # Corrected: Use 'kafka' hostname
-    networks:
-      - buyit-network
     depends_on:
       kafka:
         condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "users"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
 
   products:
     image: "koodjohvi/products:buyit"
     container_name: products-ms
     ports:
       - "8090:8090"
-    environment:
-      SPRING_APPLICATION_NAME: "products"
-      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:9092 # Corrected: Use 'kafka' hostname
-    networks:
-      - buyit-network
     depends_on:
       kafka:
         condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "products"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
 
   media:
     image: "koodjohvi/media:buyit"
     container_name: media-ms
     ports:
       - "9000:9000"
-    environment:
-      SPRING_APPLICATION_NAME: "media"
-      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:9092 # Corrected: Use 'kafka' hostname
-    networks:
-      - buyit-network
     volumes:
       - ./uploads:/uploads
     depends_on:
       kafka:
         condition: service_healthy
+      configserver:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "media"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
 
 volumes:
   kafka_data:

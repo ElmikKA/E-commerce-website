@@ -1,15 +1,45 @@
 server:
   port: 8080
+
 spring:
   application:
     name: "users"
   profiles:
     active: "prod"
-
   data:
     mongodb:
       uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/user_db?retryWrites=true&w=majority&appName=BuyIt
       database: user_db
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "users"
+    description: "Buy-it Users Microservice"
+    version: "1.0.0"
+
 
 springdoc:
   api-docs:

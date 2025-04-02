@@ -6,7 +6,6 @@ spring:
     name: "products"
   profiles:
     active: "prod"
-
   kafka:
     bootstrap-servers: "kafka:9092"
     consumer:
@@ -19,8 +18,36 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
   data:
     mongodb:
       uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/product_db?retryWrites=true&w=majority&appName=BuyIt
       database: product_db
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "products"
+    description: "Buy-it Products Microservice"
+    version: "1.0.0"

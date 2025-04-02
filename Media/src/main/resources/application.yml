@@ -1,5 +1,6 @@
 server:
   port: 9000
+
 spring:
   application:
     name: "media"
@@ -21,7 +22,35 @@ spring:
     mongodb:
       uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/media_db?retryWrites=true&w=majority&appName=BuyIt
       database: media_db
+  config:
+    import: "optional:configserver:http://localhost:8071/"
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "media"
+    description: "Buy-it Media Microservice"
+    version: "1.0.0"
 #springdoc:
 #  api-docs:
 #    path: /v3/api-docs
