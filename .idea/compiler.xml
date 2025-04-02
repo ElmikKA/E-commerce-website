@@ -8,6 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="shared-dto" />
+        <module name="eurekaserver" />
+        <module name="configserver" />
       </profile>
       <profile name="Annotation profile for Users" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -43,6 +45,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="base-domains" target="21" />
+      <module name="buyit" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -51,6 +54,8 @@
       <module name="Products" options="-parameters" />
       <module name="Users" options="-parameters" />
       <module name="base-domains" options="-parameters" />
+      <module name="configserver" options="-parameters" />
+      <module name="eurekaserver" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="products" options="-parameters" />
       <module name="users" options="-parameters" />

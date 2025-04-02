@@ -10,6 +10,8 @@
         <option value="$PROJECT_DIR$/Products/pom.xml" />
         <option value="$PROJECT_DIR$/shared-dto/pom.xml" />
         <option value="$PROJECT_DIR$/base-domains/pom.xml" />
+        <option value="$PROJECT_DIR$/eurekaserver/pom.xml" />
+        <option value="$PROJECT_DIR$/configserver/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

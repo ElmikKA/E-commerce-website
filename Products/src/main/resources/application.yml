@@ -3,7 +3,9 @@ server:
 
 spring:
   application:
-    name: products
+    name: "products"
+  profiles:
+    active: "prod"
 
   kafka:
     bootstrap-servers: "kafka:9092"

@@ -2,7 +2,9 @@ server:
   port: 8080
 spring:
   application:
-    name: users
+    name: "users"
+  profiles:
+    active: "prod"
 
   data:
     mongodb:

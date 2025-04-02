@@ -2,7 +2,9 @@ server:
   port: 9000
 spring:
   application:
-    name: media
+    name: "media"
+  profiles:
+    active: "prod"
   kafka:
     bootstrap-servers: "kafka:9092"
     consumer:
