@@ -29,8 +29,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.fetchAllProducts());
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ProductDto>> fetchProductByUserId(@PathVariable String userId) {
+    @GetMapping("/fetchByUserId")
+    public ResponseEntity<List<ProductDto>> fetchProductByUserId(@RequestParam String userId) {
         List<ProductDto> product = productService.fetchProductByUserId(userId);
         return ResponseEntity
                 .status(HttpStatus.OK)

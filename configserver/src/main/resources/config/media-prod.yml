@@ -1,5 +1,5 @@
 build:
   version: "1.0"
 
-cards:
+media:
   message: "Welcome to Buy-it media related local APIs "

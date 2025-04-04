@@ -1,5 +1,6 @@
 package com.example.Users.mapper;
 
+import com.example.Users.dto.UserDetailsDto;
 import com.example.Users.dto.UserDto;
 import com.example.Users.dto.UserRegisterDto;
 import com.example.Users.entity.Roles;
@@ -14,6 +15,14 @@ public class UserMapper {
         userDto.setEmail(user.getEmail());
         userDto.setRole(user.getRole().toString());
         return userDto;
+    }
+
+    public static UserDetailsDto mapToUsersDetailDto(User user, UserDetailsDto usersDetailsDto) {
+        usersDetailsDto.setId(user.getId());
+        usersDetailsDto.setName(user.getName());
+        usersDetailsDto.setEmail(user.getEmail());
+        usersDetailsDto.setRole(user.getRole().toString());
+        return usersDetailsDto;
     }
 
     public static User mapToUsers(UserDto userDto, User user) {

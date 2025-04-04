@@ -1,5 +1,7 @@
 package com.example.Users.service.impl;
 
+import com.example.Users.dto.ProductDto;
+import com.example.Users.dto.UserDetailsDto;
 import com.example.Users.dto.UserDto;
 import com.example.Users.dto.UserRegisterDto;
 import com.example.Users.entity.User;
@@ -8,11 +10,16 @@ import com.example.Users.exceptions.UserNotFoundException;
 import com.example.Users.mapper.UserMapper;
 import com.example.Users.repository.UserRepository;
 import com.example.Users.service.IUsersService;
+import com.example.Users.service.client.ProductsFeignClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -20,6 +27,8 @@ import java.util.List;
 public class UserServiceImpl implements IUsersService {
 
     private final UserRepository userRepository;
+    private final ProductsFeignClient productsFeignClient;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public List<UserDto> fetchUsers() {

@@ -1,5 +1,5 @@
 build:
   version: "1.0"
 
-loans:
+products:
   message: "Welcome to Buy-it products related local APIs "

@@ -1,5 +1,5 @@
 build:
   version: "1.0"
 
-accounts:
+users:
   message: "Welcome to Buy-it users related local APIs"
