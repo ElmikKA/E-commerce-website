@@ -8,7 +8,7 @@ spring:
     active: "prod"
   data:
     mongodb:
-      uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/user_db?retryWrites=true&w=majority&appName=BuyIt
+      uri: Some some
       database: user_db
   config:
     import: "optional:configserver:http://localhost:8071/"

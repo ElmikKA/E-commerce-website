@@ -20,7 +20,7 @@ spring:
 #      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
     mongodb:
-      uri: mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/media_db?retryWrites=true&w=majority&appName=BuyIt
+      uri:
       database: media_db
   config:
     import: "optional:configserver:http://localhost:8071/"
