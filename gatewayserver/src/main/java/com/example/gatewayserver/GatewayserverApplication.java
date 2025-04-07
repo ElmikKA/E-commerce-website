@@ -21,19 +21,25 @@ public class GatewayserverApplication {
 				.route(p -> p
 						.path("/buyit/users/**")
 						.filters(f -> f.rewritePath("/buyit/users/(?<segment>.*)", "/${segment}")
-								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString()))
+								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("usersCircuitBreaker")
+										.setFallbackUri("forward:/contactSupport")))
 						.uri("lb://USERS")
 				)
 				.route(p -> p
 						.path("/buyit/products/**")
 						.filters(f -> f.rewritePath("/buyit/products/(?<segment>.*)", "/${segment}")
-								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString()))
+								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("usersCircuitBreaker")
+										.setFallbackUri("forward:/contactSupport")))
 						.uri("lb://PRODUCTS")
 				)
 				.route(p -> p
 						.path("/buyit/media/**")
 						.filters(f -> f.rewritePath("/buyit/media/(?<segment>.*)", "/${segment}")
-								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString()))
+								.addRequestHeader("X-Response_Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("usersCircuitBreaker")
+										.setFallbackUri("forward:/contactSupport")))
 						.uri("lb://MEDIA")
 				).build();
 	}

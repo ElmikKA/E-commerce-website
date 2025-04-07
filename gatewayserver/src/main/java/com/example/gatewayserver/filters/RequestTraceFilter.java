@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 
-//Generates a coloration id when a request comes from api gateway
+//Generates a correlation id when a request comes from api gateway
 @Order(1)
 @Component
 public class RequestTraceFilter implements GlobalFilter {
