@@ -4,7 +4,6 @@ import com.example.Products.Entity.Product;
 import com.example.Products.constants.ProductConstants;
 import com.example.Products.dto.ProductDto;
 import com.example.Products.exceptions.*;
-import com.example.Products.kafka.ProductProducer;
 import com.example.Products.mapper.ProductMapper;
 import com.example.Products.repository.ProductRepository;
 import com.example.Products.security.SecurityUtils;
@@ -33,7 +32,7 @@ public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
     private final SecurityUtils securityUtils;
-    private final ProductProducer productProducer;
+//    private final ProductProducer productProducer;
     private final RestTemplate restTemplate;
 
     @Override
@@ -42,14 +41,7 @@ public class ProductServiceImpl implements IProductService {
         try {
             List<Product> products = productRepository.findAll();
             return products.stream().map(product -> {
-                ProductDto productDto = ProductMapper.mapToProductDto(product, new ProductDto());
-                try {
-                    String imagePath = productProducer.requestingProductImages(product.getId());
-                    productDto.setImagePath(imagePath);
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    throw new RuntimeException(e);
-                }
-                return productDto;
+                return ProductMapper.mapToProductDto(product, new ProductDto());
             }).collect(Collectors.toList());
         } catch (DataAccessException e) {
             log.error("Database error while fetching products: {}", e.getMessage());
@@ -99,7 +91,7 @@ public class ProductServiceImpl implements IProductService {
                 validateFile(file);
                 String base64ImageData = encodeImageToBase64(file);
                 ProductCreatedEvent event = new ProductCreatedEvent(savedProduct.getId(), base64ImageData);
-                productProducer.sendProductCreatedEvent(event);
+//                productProducer.sendProductCreatedEvent(event);
             } catch(Exception e) {
                 log.error("Error processing image for product id {}: {}", savedProduct.getId(), e.getMessage());
             }
@@ -143,7 +135,7 @@ public class ProductServiceImpl implements IProductService {
 
             ProductDeletedEvent event = new ProductDeletedEvent(product.getId());
             log.info("Sending a message to Media Service");
-            productProducer.sendProductDeletedEvent(event);
+//            productProducer.sendProductDeletedEvent(event);
 
             return true;
         } catch (DataAccessException e) {
