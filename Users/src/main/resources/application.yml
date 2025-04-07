@@ -8,10 +8,14 @@ spring:
     active: "prod"
   data:
     mongodb:
-      uri: Some some
+      uri: "mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/user_db?retryWrites=true&w=majority&appName=BuyIt"
       database: user_db
   config:
     import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 management:
   endpoints:
@@ -53,6 +57,14 @@ logging:
     com:
       example:
         Users: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 2
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
 
 
 
