@@ -26,26 +26,17 @@ public class UserDetailsImpl implements IUserDetailsService {
     private ProductsFeignClient productsFeignClient;
 
     @Override
-    public UserDetailsDto fetchUserDetails(String userId) {
+    public UserDetailsDto fetchUserDetails(String userId, String correlationId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException("User", "id", userId)
         );
 
         log.info("Fetching user details with id: {}", userId);
-
         UserDetailsDto userDetailsDto = UserMapper.mapToUsersDetailDto(user, new UserDetailsDto());
         try{
-            log.info("It goes inside of a try block");
-            ResponseEntity<List<ProductDto>> productsDtoResponseEntity = productsFeignClient.fetchProductDetails(userId);
-            if (productsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
-                log.info("return 200 and is in the fetch status");
-                List<ProductDto> productList = productsDtoResponseEntity.getBody();
-                userDetailsDto.setProductDto(productList);
-            } else {
-                log.error("Received non-successful status {} from products service for user id: {}. Body: {}",
-                    productsDtoResponseEntity.getStatusCode(),
-                    userId,
-                    productsDtoResponseEntity.getBody()); // Be cautious logging the body, might contain error details or be large
+            ResponseEntity<List<ProductDto>> productsDtoResponseEntity = productsFeignClient.fetchProductDetails(correlationId, userId);
+            if(productsDtoResponseEntity != null) {
+                userDetailsDto.setProductDto(productsDtoResponseEntity.getBody());
             }
         } catch (Exception e) {
             log.error("Unexpected error while fetching user details: {}", e.getMessage());
