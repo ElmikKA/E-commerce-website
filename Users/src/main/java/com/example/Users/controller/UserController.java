@@ -41,8 +41,9 @@ public class UserController {
             description = "HTTP status OK"
     )
     @GetMapping("/fetchAll")
-    public ResponseEntity<List<UserDto>> fetchUser(@RequestHeader("buyit-correlation-id")
-                                                       String correlationId) {
+    public ResponseEntity<List<UserDto>> fetchUser(
+            @RequestHeader("buyit-correlation-id") String correlationId
+    ) {
         log.debug("buyit-correlation-id found in fetchUsers() {}: ", correlationId);
         List<UserDto> users = userService.fetchUsers();
         return ResponseEntity
