@@ -44,8 +44,9 @@ public class UserController {
     public ResponseEntity<List<UserDto>> fetchUser(
             @RequestHeader("buyit-correlation-id") String correlationId
     ) {
-        log.debug("buyit-correlation-id found in fetchUsers() {}: ", correlationId);
+        log.debug("fetchUsers method start");
         List<UserDto> users = userService.fetchUsers();
+        log.debug("fetchUsers method end");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(users);
@@ -63,8 +64,9 @@ public class UserController {
     public ResponseEntity<UserDto> fetchUserById(@RequestHeader("buyit-correlation-id")
                                                      String correlationId,
                                                  @PathVariable String id) {
-        log.debug("buyit-correlation-id found fetchUsersById() {}: ", correlationId);
+        log.debug("fetchUsersById method start");
         UserDto user = userService.fetchUserById(id);
+        log.debug("fetchUsersById method end");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(user);
@@ -92,8 +94,9 @@ public class UserController {
     public ResponseEntity<ResponseDto> updateUserDetails(@RequestHeader("buyit-correlation-id")
                                                              String correlationId,
                                                          @Valid @RequestBody UserDto userDto) {
-        log.debug("buyit-correlation-id found updatedUserDetails() {}: ", correlationId);
+        log.debug("updatedUserDetails method start");
         boolean isUpdated = userService.updatedUser(userDto);
+        log.debug("updatedUserDetails method end");
         if(isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -126,8 +129,9 @@ public class UserController {
     public ResponseEntity<ResponseDto> deleteUser(@RequestHeader("buyit-correlation-id")
                                                       String correlationId,
                                                   @PathVariable String id) {
-        log.debug("buyit-correlation-id found deleteUser() {}: ", correlationId);
+        log.debug("deleteUser method start");
         boolean isDeleted = userService.deletedUser(id);
+        log.debug("deleteUser method end");
         if(isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)

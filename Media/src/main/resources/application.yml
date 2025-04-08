@@ -20,7 +20,7 @@ spring:
 #      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
     mongodb:
-      uri:
+      uri: "mongodb+srv://ingo:qFwuU6lJHI9kkHbl@buyit.9ga1j.mongodb.net/media_db?retryWrites=true&w=majority&appName=BuyIt"
       database: media_db
   config:
     import: "optional:configserver:http://localhost:8071/"
@@ -44,6 +44,9 @@ management:
   info:
     env:
       enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 eureka:
   instance:
@@ -65,6 +68,8 @@ logging:
     com:
       example:
         Media: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name}, %X{trace_id}, %X{span_id}]"
 #springdoc:
 #  api-docs:
 #    path: /v3/api-docs

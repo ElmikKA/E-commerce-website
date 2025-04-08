@@ -37,8 +37,9 @@ public class UserDetailsController {
             @RequestHeader("buyit-correlation-id")
             String correlationId,
             @RequestParam String userId) {
-        log.debug("Buyit-correlation-id found {}", correlationId);
+        log.debug("fetchUserDetails method start");
         UserDetailsDto userDetailsDto = userDetailsService.fetchUserDetails(userId, correlationId);
+        log.debug("fetchUserDetails method end");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userDetailsDto);

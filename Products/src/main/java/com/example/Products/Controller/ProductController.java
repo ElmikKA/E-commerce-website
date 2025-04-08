@@ -34,8 +34,9 @@ public class ProductController {
 
     @GetMapping("/fetchByUserId")
     public ResponseEntity<List<ProductDto>> fetchProductByUserId(@RequestHeader("buyit-correlation-id") String correlationId, @RequestParam String userId) {
-        log.debug("buyit-correlation-id found fetchProductByUserId() {}", correlationId);
+        log.debug("fetchProductByUserId method start");
         List<ProductDto> product = productService.fetchProductByUserId(userId);
+        log.debug("fetchProductByUserId method end");
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(product);
